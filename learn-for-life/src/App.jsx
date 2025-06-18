@@ -7,6 +7,8 @@ import MusicToggleButton from './components/MusicToggleButton';
 import PrestigeButton from './components/PrestigeButton';
 import FloatingText from './components/FloatingText';
 import events from './data/events';
+import EventPopup from './components/EventPopup';
+
 
 
 
@@ -81,17 +83,27 @@ function App() {
     }
   };
 
-  useEffect(() => {
+  
+useEffect(() => {
   const timer = setInterval(() => {
     const roll = Math.random();
-    if (roll < 0.2) { // 20% шанс раз в 30 сек
-      const randomEvent = events[Math.floor(Math.random() * events.length)];
-      setCurrentEvent(randomEvent);
+    if (roll < 0.2) {
+      // Получаем массив событий текущей или ближайшей предыдущей эпохи
+      let level = prestigeLevel;
+      while (level >= 0 && !events[level]) level--;
+
+      const possibleEvents = events[level] || [];
+      const randomEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
+      
+      if (randomEvent) {
+        setCurrentEvent(randomEvent);
+      }
     }
-  }, 30000); // каждые 30 сек
+  }, 30000);
 
   return () => clearInterval(timer);
-}, []);
+}, [prestigeLevel]);
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -135,33 +147,29 @@ function App() {
         <source src="/lofi.mp3" type="audio/mpeg" />
         Твой браузер не поддерживает аудио.
       </audio>
+      
       {currentEvent && (
-  <div className="event-popup">
-    <p>{currentEvent.message}</p>
-
-    {currentEvent.type === 'choice' ? (
-      <div className="event-buttons">
-        <button onClick={() => {
-          setXp(xp + currentEvent.choice.accept.xp);
-          setKnowledge(knowledge + currentEvent.choice.accept.knowledge);
-          setCurrentEvent(null);
-        }}>Принять</button>
-
-        <button onClick={() => {
-          setXp(xp + currentEvent.choice.decline.xp);
-          setKnowledge(knowledge + currentEvent.choice.decline.knowledge);
-          setCurrentEvent(null);
-        }}>Отказаться</button>
-      </div>
-    ) : (
-      <button onClick={() => {
-        setXp(xp + (currentEvent.effect?.xp ?? 0));
-        setKnowledge(knowledge + (currentEvent.effect?.knowledge ?? 0));
-        setCurrentEvent(null);
-      }}>OK</button>
-    )}
-  </div>
+  <EventPopup
+    event={currentEvent}
+    onAccept={() => {
+      setXp(xp + currentEvent.choice.accept.xp);
+      setKnowledge(knowledge + currentEvent.choice.accept.knowledge);
+      setCurrentEvent(null);
+    }}
+    onDecline={() => {
+      setXp(xp + currentEvent.choice.decline.xp);
+      setKnowledge(knowledge + currentEvent.choice.decline.knowledge);
+      setCurrentEvent(null);
+    }}
+    onOk={() => {
+      setXp(xp + (currentEvent.effect?.xp ?? 0));
+      setKnowledge(knowledge + (currentEvent.effect?.knowledge ?? 0));
+      setCurrentEvent(null);
+    }}
+  />
 )}
+
+
 
     </div>
   );
