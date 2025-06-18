@@ -6,6 +6,9 @@ import UpgradeItem from './components/UpgradeItem';
 import MusicToggleButton from './components/MusicToggleButton';
 import PrestigeButton from './components/PrestigeButton';
 import FloatingText from './components/FloatingText';
+import events from './data/events';
+
+
 
 function App() {
   const [knowledge, setKnowledge] = useState(0);
@@ -23,6 +26,7 @@ function App() {
   const [floatingTexts, setFloatingTexts] = useState([]);
 
   const currentEra = eras[prestigeLevel] || '∞ Вечный Ученик';
+  const [currentEvent, setCurrentEvent] = useState(null);
 
   const handleClick = (e) => {
     if (!musicStarted) {
@@ -78,6 +82,18 @@ function App() {
   };
 
   useEffect(() => {
+  const timer = setInterval(() => {
+    const roll = Math.random();
+    if (roll < 0.2) { // 20% шанс раз в 30 сек
+      const randomEvent = events[Math.floor(Math.random() * events.length)];
+      setCurrentEvent(randomEvent);
+    }
+  }, 30000); // каждые 30 сек
+
+  return () => clearInterval(timer);
+}, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setKnowledge(prev => prev + autoKnowledge);
       setXp(prev => prev + autoKnowledge);
@@ -119,6 +135,34 @@ function App() {
         <source src="/lofi.mp3" type="audio/mpeg" />
         Твой браузер не поддерживает аудио.
       </audio>
+      {currentEvent && (
+  <div className="event-popup">
+    <p>{currentEvent.message}</p>
+
+    {currentEvent.type === 'choice' ? (
+      <div className="event-buttons">
+        <button onClick={() => {
+          setXp(xp + currentEvent.choice.accept.xp);
+          setKnowledge(knowledge + currentEvent.choice.accept.knowledge);
+          setCurrentEvent(null);
+        }}>Принять</button>
+
+        <button onClick={() => {
+          setXp(xp + currentEvent.choice.decline.xp);
+          setKnowledge(knowledge + currentEvent.choice.decline.knowledge);
+          setCurrentEvent(null);
+        }}>Отказаться</button>
+      </div>
+    ) : (
+      <button onClick={() => {
+        setXp(xp + (currentEvent.effect?.xp ?? 0));
+        setKnowledge(knowledge + (currentEvent.effect?.knowledge ?? 0));
+        setCurrentEvent(null);
+      }}>OK</button>
+    )}
+  </div>
+)}
+
     </div>
   );
 }
