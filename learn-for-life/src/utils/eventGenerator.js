@@ -1,57 +1,74 @@
-const names = ['профессор', 'AI-ассистент', 'коллега', 'студент', 'ментор'];
-const actionsSimple = [
-  'подарил тебе редкую книгу 📘',
-  'пригласил тебя на научный кружок 🧪',
-  'рассказал лайфхак по учёбе 🧠',
-  'подкинул тебе интересный подкаст 🎧'
-];
+const rarityWeights = {
+  common: 0.6,
+  rare: 0.3,
+  epic: 0.1,
+};
 
-const simpleEffects = [
-  { xp: 10, knowledge: 5 },
-  { xp: 15, knowledge: 10 },
-  { xp: 8, knowledge: 12 },
-];
+const names = ['профессор', 'AI-ассистент', 'ментор', 'студент', 'декан'];
+const templates = {
+  simple: [
+    '{name} дал тебе инсайд: "{tip}".',
+    'Ты нашёл статью про "{tip}" — мозг взорвался 🤯',
+    'Пока пил кофе, ты понял как работает "{tip}" ☕'
+  ],
+  tips: [
+    'нейросети', 'градиентный спуск', 'систему цитирования', 'технику Pomodoro', 'вечное обучение'
+  ]
+};
 
-const choices = [
-  {
-    message: '🚀 Ты получил приглашение на международную олимпиаду. Участвуешь?',
-    accept: { xp: 25, knowledge: 15 },
-    decline: { xp: 5, knowledge: 0 }
-  },
-  {
-    message: '📢 Курсы по data science начались. Присоединиться?',
-    accept: { xp: 20, knowledge: 10 },
-    decline: { xp: 0, knowledge: 0 }
-  },
-  {
-    message: '🎓 Хочешь поучаствовать в хакатоне выходного дня?',
-    accept: { xp: 18, knowledge: 14 },
-    decline: { xp: 3, knowledge: 1 }
+const rewards = {
+  common: () => ({ xp: random(5, 10), knowledge: random(3, 8) }),
+  rare: () => ({ xp: random(12, 20), knowledge: random(10, 18) }),
+  epic: () => ({ xp: random(25, 35), knowledge: random(20, 30) }),
+};
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function chooseWeighted(weights) {
+  const total = Object.values(weights).reduce((sum, w) => sum + w, 0);
+  const roll = Math.random() * total;
+  let cumulative = 0;
+  for (const key in weights) {
+    cumulative += weights[key];
+    if (roll < cumulative) return key;
   }
-];
+  return Object.keys(weights)[0];
+}
 
 export function generateRandomEvent() {
-  const isChoice = Math.random() < 0.5;
+  const rarity = chooseWeighted(rarityWeights);
+  const typeRoll = Math.random();
 
-  if (isChoice) {
-    const choice = choices[Math.floor(Math.random() * choices.length)];
+  // RANDOM CHOICE EVENT
+  if (typeRoll < 0.4) {
+    const acceptReward = rewards[rarity]();
+    const declineReward = { xp: random(0, 3), knowledge: random(0, 2) };
     return {
       type: 'choice',
-      message: choice.message,
+      rarity,
+      risk: Math.random() < 0.2, // 20% риск
+      message: `⚖️ ${names[random(0, names.length - 1)]} предлагает рискованное сотрудничество. Что скажешь?`,
       choice: {
-        accept: choice.accept,
-        decline: choice.decline
+        accept: acceptReward,
+        decline: declineReward
       }
     };
-  } else {
-    const name = names[Math.floor(Math.random() * names.length)];
-    const action = actionsSimple[Math.floor(Math.random() * actionsSimple.length)];
-    const effect = simpleEffects[Math.floor(Math.random() * simpleEffects.length)];
+  }
+
+  // RANDOM SIMPLE EVENT
+  else {
+    const template = templates.simple[random(0, templates.simple.length - 1)];
+    const name = names[random(0, names.length - 1)];
+    const tip = templates.tips[random(0, templates.tips.length - 1)];
+    const message = template.replace('{name}', name).replace('{tip}', tip);
 
     return {
       type: 'simple',
-      message: `📚 ${name} ${action}.`,
-      effect
+      rarity,
+      message,
+      effect: rewards[rarity]()
     };
   }
 }
