@@ -9,10 +9,13 @@ import FloatingText from './components/FloatingText';
 //import events from './data/events';
 import EventPopup from './components/EventPopup';
 import { generateRandomEvent } from './utils/eventGenerator';
+import { initCustomParticles } from './utils/customParticles';
+
 
 
 
 function App() {
+
   const [knowledge, setKnowledge] = useState(0);
   const [xp, setXp] = useState(0);
   const [autoKnowledge, setAutoKnowledge] = useState(0);
@@ -84,16 +87,19 @@ function App() {
   };
 
 
+useEffect(() => {
+  initCustomParticles();
+}, []);
 
 
 useEffect(() => {
   const timer = setInterval(() => {
     const roll = Math.random();
-    if (roll < 0.2) {
+    if (roll < 0.9) {
       const generatedEvent = generateRandomEvent();
       setCurrentEvent(generatedEvent);
     }
-  }, 30000);
+  }, 10000);
 
   return () => clearInterval(timer);
 }, []);
@@ -109,6 +115,7 @@ useEffect(() => {
 
   return (
     <div className="app">
+      <div id="custom-particles" />
       <div className="floating-text-container">
         {floatingTexts.map(ft => (
           <FloatingText key={ft.id} {...ft} />
@@ -143,25 +150,29 @@ useEffect(() => {
       </audio>
       
       {currentEvent && (
-  <EventPopup
-    event={currentEvent}
-    onAccept={() => {
-      setXp(xp + currentEvent.choice.accept.xp);
-      setKnowledge(knowledge + currentEvent.choice.accept.knowledge);
-      setCurrentEvent(null);
-    }}
-    onDecline={() => {
-      setXp(xp + currentEvent.choice.decline.xp);
-      setKnowledge(knowledge + currentEvent.choice.decline.knowledge);
-      setCurrentEvent(null);
-    }}
-    onOk={() => {
-      setXp(xp + (currentEvent.effect?.xp ?? 0));
-      setKnowledge(knowledge + (currentEvent.effect?.knowledge ?? 0));
-      setCurrentEvent(null);
-    }}
-  />
+  <>
+    <div className="event-overlay" />
+    <EventPopup
+      event={currentEvent}
+      onAccept={() => {
+        setXp(xp + currentEvent.choice.accept.xp);
+        setKnowledge(knowledge + currentEvent.choice.accept.knowledge);
+        setCurrentEvent(null);
+      }}
+      onDecline={() => {
+        setXp(xp + currentEvent.choice.decline.xp);
+        setKnowledge(knowledge + currentEvent.choice.decline.knowledge);
+        setCurrentEvent(null);
+      }}
+      onOk={() => {
+        setXp(xp + (currentEvent.effect?.xp ?? 0));
+        setKnowledge(knowledge + (currentEvent.effect?.knowledge ?? 0));
+        setCurrentEvent(null);
+      }}
+    />
+  </>
 )}
+
 
 
 
