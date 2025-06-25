@@ -83,27 +83,31 @@ function App() {
     }
   };
 
-  
+
 useEffect(() => {
   const timer = setInterval(() => {
-    const roll = Math.random();
-    if (roll < 0.2) {
-      // Получаем массив событий текущей или ближайшей предыдущей эпохи
-      let level = prestigeLevel;
-      while (level >= 0 && !events[level]) level--;
-
-      const possibleEvents = events[level] || [];
-      const randomEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
+    
+    if (Math.random() < 0.2) { 
       
-      if (randomEvent) {
+      let currentPrestigeEvents = null;
+      for (let level = prestigeLevel; level >= 0; level--) {
+        if (events[level] && events[level].length > 0) {
+          currentPrestigeEvents = events[level];
+          break;
+        }
+      }
+      
+      if (currentPrestigeEvents && currentPrestigeEvents.length > 0) {
+        const randomEvent = currentPrestigeEvents[
+          Math.floor(Math.random() * currentPrestigeEvents.length)
+        ];
         setCurrentEvent(randomEvent);
       }
     }
-  }, 30000);
+  }, 30000); 
 
   return () => clearInterval(timer);
 }, [prestigeLevel]);
-
 
   useEffect(() => {
     const interval = setInterval(() => {
