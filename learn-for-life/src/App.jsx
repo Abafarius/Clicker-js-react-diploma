@@ -6,9 +6,9 @@ import UpgradeItem from './components/UpgradeItem';
 import MusicToggleButton from './components/MusicToggleButton';
 import PrestigeButton from './components/PrestigeButton';
 import FloatingText from './components/FloatingText';
-import events from './data/events';
+//import events from './data/events';
 import EventPopup from './components/EventPopup';
-
+import { generateRandomEvent } from './utils/eventGenerator';
 
 
 
@@ -84,30 +84,20 @@ function App() {
   };
 
 
+
+
 useEffect(() => {
   const timer = setInterval(() => {
-    
-    if (Math.random() < 0.2) { 
-      
-      let currentPrestigeEvents = null;
-      for (let level = prestigeLevel; level >= 0; level--) {
-        if (events[level] && events[level].length > 0) {
-          currentPrestigeEvents = events[level];
-          break;
-        }
-      }
-      
-      if (currentPrestigeEvents && currentPrestigeEvents.length > 0) {
-        const randomEvent = currentPrestigeEvents[
-          Math.floor(Math.random() * currentPrestigeEvents.length)
-        ];
-        setCurrentEvent(randomEvent);
-      }
+    const roll = Math.random();
+    if (roll < 0.2) {
+      const generatedEvent = generateRandomEvent();
+      setCurrentEvent(generatedEvent);
     }
-  }, 30000); 
+  }, 30000);
 
   return () => clearInterval(timer);
-}, [prestigeLevel]);
+}, []);
+
 
   useEffect(() => {
     const interval = setInterval(() => {
