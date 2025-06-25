@@ -1,4 +1,4 @@
-function FloatingText({ id, text, x, y }) {
+function FloatingText({ text, x, y }) {
   return (
     <span
       className="floating-text"
