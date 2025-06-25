@@ -6,39 +6,41 @@ import UpgradeItem from './components/UpgradeItem';
 import MusicToggleButton from './components/MusicToggleButton';
 import PrestigeButton from './components/PrestigeButton';
 import FloatingText from './components/FloatingText';
-//import events from './data/events';
 import EventPopup from './components/EventPopup';
 import { generateRandomEvent } from './utils/eventGenerator';
 import { initCustomParticles } from './utils/customParticles';
 
-
-
-
 function App() {
+  const [reputation, setReputation] = useState(0);
+  const [repChangeText, setRepChangeText] = useState(null);
 
   const [knowledge, setKnowledge] = useState(0);
   const [xp, setXp] = useState(0);
   const [autoKnowledge, setAutoKnowledge] = useState(0);
   const [upgrades, setUpgrades] = useState(upgradesData);
-
   const [prestigeLevel, setPrestigeLevel] = useState(0);
   const [prestigeMultiplier, setPrestigeMultiplier] = useState(1);
-
   const [musicStarted, setMusicStarted] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef(null);
-
   const [floatingTexts, setFloatingTexts] = useState([]);
+  const [currentEvent, setCurrentEvent] = useState(null);
 
   const currentEra = eras[prestigeLevel] || '∞ Вечный Ученик';
-  const [currentEvent, setCurrentEvent] = useState(null);
+
+  const triggerRepChange = (amount) => {
+    setRepChangeText({
+      text: `${amount > 0 ? '+' : ''}${amount}`,
+      className: amount > 0 ? 'rep-change rep-up' : 'rep-change rep-down',
+    });
+    setTimeout(() => setRepChangeText(null), 1000);
+  };
 
   const handleClick = (e) => {
     if (!musicStarted) {
       audioRef.current.play();
       setMusicStarted(true);
     }
-
     setKnowledge(prev => prev + 1 * prestigeMultiplier);
     setXp(prev => prev + 1 * prestigeMultiplier);
 
@@ -57,9 +59,7 @@ function App() {
       setAutoKnowledge(prev => prev + upgrade.knowledgePerSecond * prestigeMultiplier);
       setUpgrades(prev =>
         prev.map(u =>
-          u.id === upgrade.id
-            ? { ...u, cost: Math.floor(u.cost * 1.5) }
-            : u
+          u.id === upgrade.id ? { ...u, cost: Math.floor(u.cost * 1.5) } : u
         )
       );
     }
@@ -67,11 +67,7 @@ function App() {
 
   const handleToggleAudio = () => {
     if (!musicStarted) return;
-    if (isMuted) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
-    }
+    isMuted ? audioRef.current.play() : audioRef.current.pause();
     setIsMuted(!isMuted);
   };
 
@@ -86,24 +82,20 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    initCustomParticles();
+  }, []);
 
-useEffect(() => {
-  initCustomParticles();
-}, []);
-
-
-useEffect(() => {
-  const timer = setInterval(() => {
-    const roll = Math.random();
-    if (roll < 0.9) {
-      const generatedEvent = generateRandomEvent();
-      setCurrentEvent(generatedEvent);
-    }
-  }, 10000);
-
-  return () => clearInterval(timer);
-}, []);
-
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const roll = Math.random();
+      if (roll < 0.9) {
+        const newEvent = generateRandomEvent(reputation);
+        setCurrentEvent(newEvent);
+      }
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [reputation]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -127,10 +119,21 @@ useEffect(() => {
       <p>Опыт: <strong>{Math.floor(xp)}</strong></p>
       <p>🔁 Престиж: <strong>{prestigeLevel}</strong> (x{prestigeMultiplier})</p>
       <p>🏛️ Эпоха: <strong>{currentEra}</strong></p>
+      <div style={{ position: 'relative', display: 'inline-block' }}>
+  <p>🌟 Репутация: <strong>{reputation}</strong></p>
+  {repChangeText && (
+    <div className={repChangeText.className} style={{ position: 'absolute', top: '-20px', right: '-30px' }}>
+      {repChangeText.text}
+    </div>
+  )}
+</div>
+
 
       <button className="click-button" onClick={handleClick}>Учиться 🧠</button>
       <MusicToggleButton isMuted={isMuted} onToggle={handleToggleAudio} />
-      {knowledge >= 10000 && <PrestigeButton onPrestige={handlePrestige} multiplier={prestigeMultiplier + 0.1} />}
+      {knowledge >= 10000 && (
+        <PrestigeButton onPrestige={handlePrestige} multiplier={prestigeMultiplier + 0.1} />
+      )}
 
       <h2>Улучшения:</h2>
       <div className="upgrades">
@@ -148,34 +151,42 @@ useEffect(() => {
         <source src="/lofi.mp3" type="audio/mpeg" />
         Твой браузер не поддерживает аудио.
       </audio>
-      
+
       {currentEvent && (
-  <>
-    <div className="event-overlay" />
-    <EventPopup
-      event={currentEvent}
-      onAccept={() => {
-        setXp(xp + currentEvent.choice.accept.xp);
-        setKnowledge(knowledge + currentEvent.choice.accept.knowledge);
-        setCurrentEvent(null);
-      }}
-      onDecline={() => {
-        setXp(xp + currentEvent.choice.decline.xp);
-        setKnowledge(knowledge + currentEvent.choice.decline.knowledge);
-        setCurrentEvent(null);
-      }}
-      onOk={() => {
-        setXp(xp + (currentEvent.effect?.xp ?? 0));
-        setKnowledge(knowledge + (currentEvent.effect?.knowledge ?? 0));
-        setCurrentEvent(null);
-      }}
-    />
-  </>
-)}
-
-
-
-
+        <>
+          <div className="event-overlay" />
+          <EventPopup
+            event={currentEvent}
+            onAccept={() => {
+              const { xp: aXp, knowledge: aK, reputation: aRep = 0 } = currentEvent.choice.accept;
+              setXp(prev => prev + aXp);
+              setKnowledge(prev => prev + aK);
+              setReputation(prev => {
+                triggerRepChange(aRep);
+                return prev + aRep;
+              });
+              setCurrentEvent(null);
+            }}
+            onDecline={() => {
+              const { xp: dXp, knowledge: dK, reputation: dRep = 0 } = currentEvent.choice.decline;
+              setXp(prev => prev + dXp);
+              setKnowledge(prev => prev + dK);
+              setReputation(prev => {
+                triggerRepChange(dRep);
+                return prev + dRep;
+              });
+              setCurrentEvent(null);
+            }}
+            onOk={() => {
+              const xpGain = currentEvent.effect?.xp ?? 0;
+              const knowledgeGain = currentEvent.effect?.knowledge ?? 0;
+              setXp(prev => prev + xpGain);
+              setKnowledge(prev => prev + knowledgeGain);
+              setCurrentEvent(null);
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }
