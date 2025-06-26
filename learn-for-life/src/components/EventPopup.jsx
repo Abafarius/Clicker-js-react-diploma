@@ -1,7 +1,7 @@
 import React from 'react';
 import './EventPopup.css';
 
-function EventPopup({ event, onAccept, onDecline, onOk, countdown, aiComment }) {
+function EventPopup({ event, onAccept, onDecline, onOk, countdown, aiComment, storyInfo }) {
   if (!event) return null;
 
   const { message = {}, choice, choices = choice, rarity = 'common' } = event;
@@ -11,6 +11,10 @@ function EventPopup({ event, onAccept, onDecline, onOk, countdown, aiComment }) 
   return (
     <div className={`event-popup event-${rarity}`}>
       <p>{message}</p>
+
+      {storyInfo && (
+        <div className="story-info">{storyInfo}</div>
+      )}
 
       {countdown !== null && (
         <div className="event-timer">⏳ Осталось: {countdown} сек</div>
