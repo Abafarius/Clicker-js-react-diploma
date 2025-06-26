@@ -1,19 +1,24 @@
 import React from 'react';
 import './EventPopup.css';
 
-function EventPopup({ event, onAccept, onDecline, onOk, storyInfo }) {
+function EventPopup({ event, onAccept, onDecline, onOk, countdown, aiComment }) {
   if (!event) return null;
 
-  const { message, effect = {}, choice, choices = choice, rarity = 'common' } = event;
-  const acceptText =
-    typeof choices?.accept === 'string' ? choices.accept : 'Принять';
-  const declineText =
-    typeof choices?.decline === 'string' ? choices.decline : 'Отклонить';
+  const { message = {}, choice, choices = choice, rarity = 'common' } = event;
+  const acceptText = typeof choices?.accept === 'string' ? choices.accept : 'Принять';
+  const declineText = typeof choices?.decline === 'string' ? choices.decline : 'Отклонить';
 
   return (
     <div className={`event-popup event-${rarity}`}>
-      {storyInfo && <div className="story-indicator-popup">{storyInfo}</div>}
       <p>{message}</p>
+
+      {countdown !== null && (
+        <div className="event-timer">⏳ Осталось: {countdown} сек</div>
+      )}
+
+      {aiComment && (
+        <div className="ai-comment">{aiComment}</div>
+      )}
 
       {choices && choices.accept && choices.decline ? (
         <div className="event-buttons">
@@ -28,6 +33,5 @@ function EventPopup({ event, onAccept, onDecline, onOk, storyInfo }) {
     </div>
   );
 }
-
 
 export default EventPopup;
