@@ -8,19 +8,19 @@ import MusicToggleButton from './components/MusicToggleButton';
 import PrestigeButton from './components/PrestigeButton';
 import FloatingText from './components/FloatingText';
 import EventPopup from './components/EventPopup';
+import EventLogModal from './components/EventLogModal';
 import { generateRandomEvent } from './utils/eventGenerator';
 import { initCustomParticles } from './utils/customParticles';
 import { startAutoEventTimeout, clearAutoEventTimeout } from './utils/autoEventTimeout';
 
-
 function App() {
   const [autoCountdown, setAutoCountdown] = useState(null);
   const [aiComment, setAiComment] = useState('');
-
+  const [eventLog, setEventLog] = useState([]);
+  const [showLog, setShowLog] = useState(false);
 
   const [reputation, setReputation] = useState(0);
   const [repChangeText, setRepChangeText] = useState(null);
-
   const [knowledge, setKnowledge] = useState(0);
   const [xp, setXp] = useState(0);
   const [autoKnowledge, setAutoKnowledge] = useState(0);
@@ -32,7 +32,6 @@ function App() {
   const audioRef = useRef(null);
   const [floatingTexts, setFloatingTexts] = useState([]);
   const [currentEvent, setCurrentEvent] = useState(null);
-
   const [currentStory, setCurrentStory] = useState(null);
   const [storyStep, setStoryStep] = useState(0);
 
@@ -53,7 +52,6 @@ function App() {
     }
     setKnowledge(prev => prev + 1 * prestigeMultiplier);
     setXp(prev => prev + 1 * prestigeMultiplier);
-
     const id = Date.now();
     const x = e.clientX - 20;
     const y = e.clientY - 20;
@@ -61,6 +59,16 @@ function App() {
     setTimeout(() => {
       setFloatingTexts(prev => prev.filter(f => f.id !== id));
     }, 1000);
+  };
+
+  const logEvent = (type, message, outcome, reward = {}) => {
+    setEventLog(prev => [...prev, {
+      timestamp: Date.now(),
+      type,
+      message,
+      outcome,
+      reward,
+    }]);
   };
 
   const handleBuyUpgrade = (upgrade) => {
@@ -92,13 +100,25 @@ function App() {
     }
   };
 
+  const handleStoryNext = () => {
+    if (!currentStory) return;
+    const nextStep = storyStep + 1;
+    if (nextStep < currentStory.length) {
+      setStoryStep(nextStep);
+      setCurrentEvent(currentStory[nextStep]);
+    } else {
+      setCurrentStory(null);
+      setStoryStep(0);
+      setCurrentEvent(null);
+    }
+  };
+
   useEffect(() => {
     initCustomParticles();
   }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      // Сюжетная цепочка активна
       if (currentStory) {
         setCurrentEvent(currentStory[storyStep]);
         return;
@@ -127,50 +147,33 @@ function App() {
     return () => clearInterval(interval);
   }, [autoKnowledge]);
 
-  const handleStoryNext = () => {
-    if (!currentStory) return;
-    const nextStep = storyStep + 1;
-    if (nextStep < currentStory.length) {
-      setStoryStep(nextStep);
-      setCurrentEvent(currentStory[nextStep]);
-    } else {
-      setCurrentStory(null);
-      setStoryStep(0);
-      setCurrentEvent(null);
+  useEffect(() => {
+    if (currentEvent) {
+      setAiComment('');
+      setAutoCountdown(15);
+
+      startAutoEventTimeout(() => {
+        setAiComment('🤖 Ты задумался слишком долго, решение принято за тебя...');
+        if (currentEvent.type === 'Choices') {
+          document.querySelector('.event-buttons button:last-child')?.click();
+        } else {
+          document.querySelector('.event-buttons button')?.click();
+        }
+      }, setAutoCountdown);
     }
-  };
 
-useEffect(() => {
-  if (currentEvent) {
-    setAiComment('');
-    setAutoCountdown(15); // начальное значение
-
-    startAutoEventTimeout(() => {
-      setAiComment('🤖 Ты задумался слишком долго, решение принято за тебя...');
-      if (currentEvent.type === 'Choices') {
-        document.querySelector('.event-buttons button:last-child')?.click();
-      } else {
-        document.querySelector('.event-buttons button')?.click();
-      }
-    }, setAutoCountdown);
-  }
-
-  return () => {
-    clearAutoEventTimeout();
-    setAutoCountdown(null);
-    setAiComment('');
-  };
-}, [currentEvent]);
-
-
+    return () => {
+      clearAutoEventTimeout();
+      setAutoCountdown(null);
+      setAiComment('');
+    };
+  }, [currentEvent]);
 
   return (
     <div className="app">
       <div id="custom-particles" />
       <div className="floating-text-container">
-        {floatingTexts.map(ft => (
-          <FloatingText key={ft.id} {...ft} />
-        ))}
+        {floatingTexts.map(ft => <FloatingText key={ft.id} {...ft} />)}
       </div>
 
       <h1>📚 Век живи — век учись</h1>
@@ -180,19 +183,20 @@ useEffect(() => {
       <p>🏛️ Эпоха: <strong>{currentEra}</strong></p>
 
       <p>
-  🌟 Репутация: <strong style={{ position: 'relative' }}>
-    {reputation}
-    {repChangeText && (
-      <span className={repChangeText.className} style={{ position: 'absolute', left: '110%', top: '-4px' }}>
-        {repChangeText.text}
-      </span>
-    )}
-  </strong>
-</p>
-
+        🌟 Репутация: <strong style={{ position: 'relative' }}>
+          {reputation}
+          {repChangeText && (
+            <span className={repChangeText.className} style={{ position: 'absolute', left: '110%', top: '-4px' }}>
+              {repChangeText.text}
+            </span>
+          )}
+        </strong>
+      </p>
 
       <button className="click-button" onClick={handleClick}>Учиться 🧠</button>
       <MusicToggleButton isMuted={isMuted} onToggle={handleToggleAudio} />
+      <button onClick={() => setShowLog(true)}>📜 История событий</button>
+
       {knowledge >= 10000 && (
         <PrestigeButton onPrestige={handlePrestige} multiplier={prestigeMultiplier + 0.1} />
       )}
@@ -200,12 +204,7 @@ useEffect(() => {
       <h2>Улучшения:</h2>
       <div className="upgrades">
         {upgrades.map(upg => (
-          <UpgradeItem
-            key={upg.id}
-            upgrade={upg}
-            onBuy={handleBuyUpgrade}
-            disabled={xp < upg.cost}
-          />
+          <UpgradeItem key={upg.id} upgrade={upg} onBuy={handleBuyUpgrade} disabled={xp < upg.cost} />
         ))}
       </div>
 
@@ -214,74 +213,57 @@ useEffect(() => {
         Твой браузер не поддерживает аудио.
       </audio>
 
-{currentEvent && (
-  <>
-    <div className="event-overlay" />
-    <EventPopup
-    
-  event={currentEvent}
-  countdown={autoCountdown}
-  aiComment={aiComment}
-      storyInfo={
-        currentStory
-          ? `📖 Сюжетная цепочка — Этап ${storyStep + 1}/${currentStory.length}`
-          : null
-      }
-      onAccept={() => {
-        const { effect, choice } = currentEvent;
-        if (effect) {
-          const { xp = 0, knowledge = 0, reputation = 0 } = effect;
-          setXp(prev => prev + xp);
-          setKnowledge(prev => prev + knowledge);
-          setReputation(prev => {
-            triggerRepChange(reputation);
-            return prev + reputation;
-          });
-        } else if (choice?.accept) {
-          const { xp = 0, knowledge = 0, reputation = 0 } = choice.accept;
-          setXp(prev => prev + xp);
-          setKnowledge(prev => prev + knowledge);
-          setReputation(prev => {
-            triggerRepChange(reputation);
-            return prev + reputation;
-          });
-        }
-        currentStory ? handleStoryNext() : setCurrentEvent(null);
-      }}
-      onDecline={() => {
-        const { effect, choice } = currentEvent;
-        if (effect) {
-          const { xp = 0, knowledge = 0, reputation = 0 } = effect;
-          setXp(prev => prev + xp);
-          setKnowledge(prev => prev + knowledge);
-          setReputation(prev => {
-            triggerRepChange(reputation);
-            return prev + reputation;
-          });
-        } else if (choice?.decline) {
-          const { xp = 0, knowledge = 0, reputation = 0 } = choice.decline;
-          setXp(prev => prev + xp);
-          setKnowledge(prev => prev + knowledge);
-          setReputation(prev => {
-            triggerRepChange(reputation);
-            return prev + reputation;
-          });
-        }
-        currentStory ? handleStoryNext() : setCurrentEvent(null);
-      }}
-      onOk={() => {
-        const { xp = 0, knowledge = 0, reputation = 0 } = currentEvent.effect || {};
-        setXp(prev => prev + xp);
-        setKnowledge(prev => prev + knowledge);
-        setReputation(prev => {
-          triggerRepChange(reputation);
-          return prev + reputation;
-        });
-        currentStory ? handleStoryNext() : setCurrentEvent(null);
-      }}
-    />
-  </>
-)}
+      {currentEvent && (
+        <>
+          <div className="event-overlay" />
+          <EventPopup
+            event={currentEvent}
+            countdown={autoCountdown}
+            aiComment={aiComment}
+            storyInfo={currentStory ? `📖 Сюжетная цепочка — Этап ${storyStep + 1}/${currentStory.length}` : null}
+            onAccept={() => {
+              const { effect, choice, message } = currentEvent;
+              const reward = effect || choice?.accept || {};
+              setXp(prev => prev + (reward.xp || 0));
+              setKnowledge(prev => prev + (reward.knowledge || 0));
+              setReputation(prev => {
+                triggerRepChange(reward.reputation || 0);
+                return prev + (reward.reputation || 0);
+              });
+              logEvent('choice', message, 'принял', reward);
+              currentStory ? handleStoryNext() : setCurrentEvent(null);
+            }}
+            onDecline={() => {
+              const { effect, choice, message } = currentEvent;
+              const reward = effect || choice?.decline || {};
+              setXp(prev => prev + (reward.xp || 0));
+              setKnowledge(prev => prev + (reward.knowledge || 0));
+              setReputation(prev => {
+                triggerRepChange(reward.reputation || 0);
+                return prev + (reward.reputation || 0);
+              });
+              logEvent('choice', message, 'отклонил', reward);
+              currentStory ? handleStoryNext() : setCurrentEvent(null);
+            }}
+            onOk={() => {
+              const { message, effect = {} } = currentEvent;
+              const { xp = 0, knowledge = 0, reputation = 0 } = effect;
+              setXp(prev => prev + xp);
+              setKnowledge(prev => prev + knowledge);
+              setReputation(prev => {
+                triggerRepChange(reputation);
+                return prev + reputation;
+              });
+              logEvent('simple', message, 'ок', effect);
+              currentStory ? handleStoryNext() : setCurrentEvent(null);
+            }}
+          />
+        </>
+      )}
+
+      {showLog && (
+        <EventLogModal eventLog={eventLog} onClose={() => setShowLog(false)} />
+      )}
     </div>
   );
 }
