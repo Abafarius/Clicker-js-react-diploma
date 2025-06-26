@@ -10,8 +10,14 @@ import FloatingText from './components/FloatingText';
 import EventPopup from './components/EventPopup';
 import { generateRandomEvent } from './utils/eventGenerator';
 import { initCustomParticles } from './utils/customParticles';
+import { startAutoEventTimeout, clearAutoEventTimeout } from './utils/autoEventTimeout';
+
 
 function App() {
+  const [autoCountdown, setAutoCountdown] = useState(null);
+  const [aiComment, setAiComment] = useState('');
+
+
   const [reputation, setReputation] = useState(0);
   const [repChangeText, setRepChangeText] = useState(null);
 
@@ -108,7 +114,7 @@ function App() {
 
       const newEvent = generateRandomEvent(reputation);
       setCurrentEvent(newEvent);
-    }, 52000);
+    }, 20000);
 
     return () => clearInterval(timer);
   }, [reputation, currentStory, storyStep]);
@@ -133,6 +139,30 @@ function App() {
       setCurrentEvent(null);
     }
   };
+
+useEffect(() => {
+  if (currentEvent) {
+    setAiComment('');
+    setAutoCountdown(15); // начальное значение
+
+    startAutoEventTimeout(() => {
+      setAiComment('🤖 Ты задумался слишком долго, решение принято за тебя...');
+      if (currentEvent.type === 'Choices') {
+        document.querySelector('.event-buttons button:last-child')?.click();
+      } else {
+        document.querySelector('.event-buttons button')?.click();
+      }
+    }, setAutoCountdown);
+  }
+
+  return () => {
+    clearAutoEventTimeout();
+    setAutoCountdown(null);
+    setAiComment('');
+  };
+}, [currentEvent]);
+
+
 
   return (
     <div className="app">
@@ -188,7 +218,10 @@ function App() {
   <>
     <div className="event-overlay" />
     <EventPopup
-      event={currentEvent}
+    
+  event={currentEvent}
+  countdown={autoCountdown}
+  aiComment={aiComment}
       storyInfo={
         currentStory
           ? `📖 Сюжетная цепочка — Этап ${storyStep + 1}/${currentStory.length}`
