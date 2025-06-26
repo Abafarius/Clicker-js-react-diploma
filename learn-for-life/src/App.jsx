@@ -12,8 +12,12 @@ import EventLogModal from './components/EventLogModal';
 import { generateRandomEvent } from './utils/eventGenerator';
 import { initCustomParticles } from './utils/customParticles';
 import { startAutoEventTimeout, clearAutoEventTimeout } from './utils/autoEventTimeout';
+import EpochTransition from './components/EpochTransition';
+
 
 function App() {
+  const [showEpochTransition, setShowEpochTransition] = useState(false);
+
   const [autoCountdown, setAutoCountdown] = useState(null);
   const [aiComment, setAiComment] = useState('');
   const [eventLog, setEventLog] = useState([]);
@@ -23,7 +27,7 @@ function App() {
   const [repChangeText, setRepChangeText] = useState(null);
   const [knowledge, setKnowledge] = useState(0);
   const [xp, setXp] = useState(0);
-  const [autoKnowledge, setAutoKnowledge] = useState(0);
+  const [autoKnowledge, setAutoKnowledge] = useState(9999);
   const [upgrades, setUpgrades] = useState(upgradesData);
   const [prestigeLevel, setPrestigeLevel] = useState(0);
   const [prestigeMultiplier, setPrestigeMultiplier] = useState(1);
@@ -90,15 +94,18 @@ function App() {
   };
 
   const handlePrestige = () => {
-    if (knowledge >= 10000) {
-      setPrestigeLevel(prev => prev + 1);
-      setPrestigeMultiplier(prev => +(prev + 0.1).toFixed(1));
-      setKnowledge(0);
-      setXp(0);
-      setAutoKnowledge(0);
-      setUpgrades(upgradesData);
-    }
-  };
+  if (knowledge >= 10000) {
+    const nextLevel = prestigeLevel + 1;
+    setShowEpochTransition(true);
+    setPrestigeLevel(nextLevel);
+    setPrestigeMultiplier(prev => +(prev + 0.1).toFixed(1));
+    setKnowledge(0);
+    setXp(0);
+    setAutoKnowledge(0);
+    setUpgrades(upgradesData);
+  }
+};
+
 
   const handleStoryNext = () => {
     if (!currentStory) return;
@@ -171,6 +178,14 @@ function App() {
 
   return (
     <div className="app">
+
+      <EpochTransition
+  currentEpoch={currentEra} // передай текущую эпоху: 'Abiturient', 'Student' и т.п.
+  visible={showEpochTransition}
+  onComplete={() => setShowEpochTransition(false)}
+/>
+
+
       <div id="custom-particles" />
       <div className="floating-text-container">
         {floatingTexts.map(ft => <FloatingText key={ft.id} {...ft} />)}
