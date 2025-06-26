@@ -128,4 +128,20 @@
   animation: fadeInPopup 0.4s ease-out;
 }
 
+/* В EventPopup.css */
+.event-timer {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #00ffd5;
+  text-shadow: 0 0 4px #00ffee;
+  font-weight: bold;
+}
+
+.ai-comment {
+  margin-top: 8px;
+  font-size: 13px;
+  font-style: italic;
+  color: #bbbbbb;
+  opacity: 0.85;
+}
 
