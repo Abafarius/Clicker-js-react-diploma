@@ -1,0 +1,33 @@
+.login-container, .register-container {
+  max-width: 400px;
+  margin: 10vh auto;
+  background-color: #111;
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,255,255,0.4);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 1rem;
+  background: #222;
+  color: #fff;
+  border: 1px solid #0ff;
+  border-radius: 8px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #0ff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+a {
+  color: #0ff;
+}
