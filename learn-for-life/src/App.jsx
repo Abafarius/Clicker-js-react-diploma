@@ -27,7 +27,7 @@ function App() {
   const [repChangeText, setRepChangeText] = useState(null);
   const [knowledge, setKnowledge] = useState(0);
   const [xp, setXp] = useState(0);
-  const [autoKnowledge, setAutoKnowledge] = useState(9999);
+  const [autoKnowledge, setAutoKnowledge] = useState(0);
   const [upgrades, setUpgrades] = useState(upgradesData);
   const [prestigeLevel, setPrestigeLevel] = useState(0);
   const [prestigeMultiplier, setPrestigeMultiplier] = useState(1);
@@ -141,7 +141,7 @@ function App() {
 
       const newEvent = generateRandomEvent(reputation);
       setCurrentEvent(newEvent);
-    }, 20000);
+    }, 40000);
 
     return () => clearInterval(timer);
   }, [reputation, currentStory, storyStep]);
