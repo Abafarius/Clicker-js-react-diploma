@@ -18,6 +18,13 @@ input {
   border-radius: 8px;
 }
 
+input:focus {
+  border-color: #00ffff;
+  box-shadow: 0 0 10px #0ff;
+  outline: none;
+}
+
+
 button {
   width: 100%;
   padding: 12px;
