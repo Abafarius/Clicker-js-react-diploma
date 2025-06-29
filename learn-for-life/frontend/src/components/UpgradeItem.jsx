@@ -7,7 +7,7 @@ function UpgradeItem({ upgrade, onBuy, disabled }) {
         <div className="upgrade-cost">Купить за {upgrade.cost} XP</div>
       </div>
       <button
-        className="upgrade-button"
+        className="btn btn-upgrade"
         onClick={() => onBuy(upgrade)}
         disabled={disabled}
       >
