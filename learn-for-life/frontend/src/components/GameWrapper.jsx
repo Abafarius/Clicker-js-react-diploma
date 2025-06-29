@@ -3,8 +3,6 @@ import { useState, useRef, useEffect } from 'react';
 import upgradesData from '../data/upgrades';
 import eras from '../data/eras';
 import storyChains from '../data/storyChains';
-import UpgradeItem from './UpgradeItem';
-import MusicToggleButton from './MusicToggleButton';
 import PrestigeButton from './PrestigeButton';
 import FloatingText from './FloatingText';
 import EventPopup from './EventPopup';

@@ -1,6 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Comfortaa:wght@400;600;700&display=swap');
 
 :root {
+  --font-size-base: 18px;
+  --font-size-large: 22px;
+  --font-size-xlarge: 28px;
+  --padding-base: 16px;
+
+  --glow-blue: 0 0 12px rgba(0, 242, 255, 0.6), 0 0 24px rgba(0, 242, 255, 0.3);
+  --glow-purple: 0 0 12px rgba(168, 85, 247, 0.6), 0 0 24px rgba(168, 85, 247, 0.3);
+  --glow-orange: 0 0 12px rgba(255, 166, 0, 0.6), 0 0 24px rgba(255, 166, 0, 0.3);
+  --glow-green: 0 0 12px rgba(16, 185, 129, 0.6), 0 0 24px rgba(16, 185, 129, 0.3);
+  --glass-bg: rgba(28, 30, 47, 0.6);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --hover-impulse: linear-gradient(270deg, #00e6ff, #5f7eff, #a855f7, #00e6ff);
+
   --font-primary: 'Segoe UI', 'Roboto', sans-serif;
   --font-secondary: 'Comfortaa', cursive;
   --color-bg-dark: #0a0a0a;
@@ -33,6 +46,7 @@
 }
 
 body {
+  font-size: var(--font-size-base);
   margin: 0;
   padding: 0;
   font-family: var(--font-primary);
@@ -467,7 +481,8 @@ body {
   animation: fadeInOut 4s ease-in-out forwards;
 }
 
-.epoch-transition .epoch-title {
+.epoch-transition /* Поочередная анимация букв в .epoch-title */
+.epoch-title {
   font-size: 2.5rem;
   font-weight: bold;
   text-shadow: 0 0 10px white;
@@ -666,7 +681,8 @@ body {
   background: rgba(0, 0, 0, 0.85); /* затемнение */
 }
 
-.epoch-transition .epoch-title {
+.epoch-transition /* Поочередная анимация букв в .epoch-title */
+.epoch-title {
   font-size: 3rem;
   font-weight: bold;
   text-shadow:
@@ -715,6 +731,7 @@ body {
 
 
 body {
+  font-size: var(--font-size-base);
   font-family: 'Comfortaa', var(--font-primary);
 }
 
@@ -741,3 +758,524 @@ body {
 
 
 
+
+
+/* === CyberNeoglow Enhancements === */
+
+.card, .upgrade-card, .stats-panel p {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: var(--glass-border);
+  box-shadow: var(--shadow-cyan-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before, .upgrade-card::before, .stats-panel p::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--hover-impulse);
+  background-size: 600% 600%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+  animation: pulseGradient 6s ease infinite;
+}
+
+.card:hover::before, .upgrade-card:hover::before, .stats-panel p:hover::before {
+  opacity: 0.1;
+}
+
+.card *, .upgrade-card *, .stats-panel p * {
+  position: relative;
+  z-index: 1;
+}
+
+
+.modal-content {
+  background: rgba(20, 20, 30, 0.6);
+  border: var(--glass-border);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+}
+
+
+.btn {
+  box-shadow: inset 0 0 0 rgba(255,255,255,0), var(--glow-blue);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: inset 0 0 0 rgba(255,255,255,0), var(--glow-purple);
+}
+
+.btn-learn {
+  animation: breatheGlow 3s ease-in-out infinite;
+  background: var(--gradient-main);
+  box-shadow: var(--glow-blue);
+}
+
+.btn-learn:active {
+  animation: none;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), inset 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+
+.epoch-transition {
+  background: #000;
+  animation: glitchStorm 3s ease-in-out forwards;
+}
+
+.epoch-transition /* Поочередная анимация букв в .epoch-title */
+.epoch-title {
+  font-size: 3rem;
+  font-family: var(--font-secondary);
+  color: white;
+  text-shadow: 0 0 10px white, 0 0 20px #00e6ff, 0 0 40px #5f7eff;
+  animation: textAssemble 3s ease forwards;
+}
+
+
+@keyframes pulseGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes breatheGlow {
+  0%, 100% { box-shadow: 0 0 12px rgba(0,255,255,0.4); }
+  50% { box-shadow: 0 0 20px rgba(0,255,255,0.8); }
+}
+
+@keyframes glitchStorm {
+  0% { opacity: 1; transform: scale(1); }
+  30% { opacity: 0.8; transform: scale(1.03) rotate(1deg); }
+  60% { opacity: 0.6; transform: scale(0.97) rotate(-1deg); }
+  80% { opacity: 0.8; transform: scale(1.02); }
+  100% { opacity: 0; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes textAssemble {
+  0% { opacity: 0; transform: scale(0.5) translateY(50px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Увеличенные заголовки и кнопки */
+.header-gradient,
+.welcome-title,
+/* Поочередная анимация букв в .epoch-title */
+.epoch-title {
+  font-size: var(--font-size-xlarge);
+  letter-spacing: 1.2px;
+  text-shadow: 0 0 6px var(--color-accent-cyan);
+}
+
+.btn {
+  font-size: var(--font-size-large);
+  padding: var(--padding-base) 24px;
+}
+
+/* Элегантная анимация перехода эпохи */
+.epoch-transition {
+  animation: smoothEpochTransition 2.5s ease-in-out forwards;
+  transform-origin: center center;
+  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.85);
+}
+
+@keyframes smoothEpochTransition {
+  0% {
+    opacity: 0;
+    transform: scale(1.4);
+    filter: blur(12px);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Поочередная анимация букв в .epoch-title */
+.epoch-title {
+  animation: fadeInEpochText 1.2s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInEpochText {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Затемнение интерфейса при модалках/попапах */
+.overlay-active::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 900;
+}
+
+/* Камера-зум при переходе эпох */
+.epoch-zoom {
+  animation: epochZoom 2.4s ease-in-out forwards;
+  transform-origin: center;
+}
+
+@keyframes epochZoom {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  75% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.epoch-title {
+  display: inline-flex;
+  gap: 2px;
+  font-size: var(--font-size-xlarge);
+  font-family: var(--font-secondary);
+  text-shadow: 0 0 6px var(--color-accent-cyan);
+  transform: translateY(10px);
+}
+
+.epoch-title span {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  animation: letterFadeIn 0.6s forwards;
+  color: var(--color-text-light);
+  text-shadow: 0 0 4px var(--color-accent-cyan);
+}
+
+/* Задержки анимации на основе порядка */
+.epoch-title span:nth-child(1) { animation-delay: 0.05s; }
+.epoch-title span:nth-child(2) { animation-delay: 0.10s; }
+.epoch-title span:nth-child(3) { animation-delay: 0.15s; }
+.epoch-title span:nth-child(4) { animation-delay: 0.20s; }
+.epoch-title span:nth-child(5) { animation-delay: 0.25s; }
+.epoch-title span:nth-child(6) { animation-delay: 0.30s; }
+.epoch-title span:nth-child(7) { animation-delay: 0.35s; }
+.epoch-title span:nth-child(8) { animation-delay: 0.40s; }
+.epoch-title span:nth-child(9) { animation-delay: 0.45s; }
+.epoch-title span:nth-child(10) { animation-delay: 0.50s; }
+.epoch-title span:nth-child(11) { animation-delay: 0.55s; }
+.epoch-title span:nth-child(12) { animation-delay: 0.60s; }
+.epoch-title span:nth-child(13) { animation-delay: 0.65s; }
+.epoch-title span:nth-child(14) { animation-delay: 0.70s; }
+.epoch-title span:nth-child(15) { animation-delay: 0.75s; }
+.epoch-title span:nth-child(16) { animation-delay: 0.80s; }
+.epoch-title span:nth-child(17) { animation-delay: 0.85s; }
+.epoch-title span:nth-child(18) { animation-delay: 0.90s; }
+.epoch-title span:nth-child(19) { animation-delay: 0.95s; }
+.epoch-title span:nth-child(20) { animation-delay: 1.00s; }
+.epoch-title span:nth-child(21) { animation-delay: 1.05s; }
+.epoch-title span:nth-child(22) { animation-delay: 1.10s; }
+.epoch-title span:nth-child(23) { animation-delay: 1.15s; }
+.epoch-title span:nth-child(24) { animation-delay: 1.20s; }
+.epoch-title span:nth-child(25) { animation-delay: 1.25s; }
+.epoch-title span:nth-child(26) { animation-delay: 1.30s; }
+.epoch-title span:nth-child(27) { animation-delay: 1.35s; }
+.epoch-title span:nth-child(28) { animation-delay: 1.40s; }
+.epoch-title span:nth-child(29) { animation-delay: 1.45s; }
+.epoch-title span:nth-child(30) { animation-delay: 1.50s; }
+.epoch-title span:nth-child(31) { animation-delay: 1.55s; }
+.epoch-title span:nth-child(32) { animation-delay: 1.60s; }
+.epoch-title span:nth-child(33) { animation-delay: 1.65s; }
+.epoch-title span:nth-child(34) { animation-delay: 1.70s; }
+.epoch-title span:nth-child(35) { animation-delay: 1.75s; }
+.epoch-title span:nth-child(36) { animation-delay: 1.80s; }
+.epoch-title span:nth-child(37) { animation-delay: 1.85s; }
+.epoch-title span:nth-child(38) { animation-delay: 1.90s; }
+.epoch-title span:nth-child(39) { animation-delay: 1.95s; }
+.epoch-title span:nth-child(40) { animation-delay: 2.00s; }
+
+@keyframes letterFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+    filter: blur(4px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-4px) scale(1.05);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ===== ЭФФЕКТЫ ДЛЯ БУКВ ПЕРЕХОДА ЭПОХИ ===== */
+
+.epoch-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  animation: letterFadeIn 0.6s forwards;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+  color: var(--color-accent-cyan);
+  text-shadow:
+    0 0 3px var(--color-accent-cyan),
+    0 0 6px var(--color-accent-blue),
+    0 0 9px rgba(0, 255, 255, 0.5);
+  position: relative;
+}
+
+.epoch-letter::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0.6;
+  animation: spark 1.2s ease-out infinite;
+}
+
+@keyframes letterFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spark {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+}
+.epoch-title.no-border {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+/* ========= WELCOME STAR WARS STYLE ========= */
+
+.star-wars-welcome {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: black;
+  font-family: 'Segoe UI', 'Comfortaa', sans-serif;
+  color: #ffe81f;
+}
+
+.welcome-hyperspace {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(white 1px, transparent 2px);
+  background-size: 3px 3px;
+  animation: warpStars 1.5s linear infinite;
+  opacity: 0.4;
+  z-index: 0;
+  filter: blur(1px);
+}
+
+@keyframes warpStars {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(0, -100%, 0) scale(1.2);
+  }
+}
+
+.star-wars-background {
+  position: absolute;
+  inset: 0;
+  background: black;
+  z-index: 1;
+}
+
+.star-wars-intro {
+  z-index: 2;
+  position: absolute;
+  top: 10%;
+  width: 100%;
+  text-align: center;
+  color: #0ff;
+  font-size: 1.5rem;
+  text-shadow: 0 0 8px #0ff;
+}
+
+.star-wars-crawl {
+  perspective: 600px;
+  overflow: hidden;
+  height: 100vh;
+  z-index: 2;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.crawl-content {
+  transform: rotateX(25deg) translateZ(0);
+  font-size: 2rem;
+  line-height: 2.4rem;
+  text-align: center;
+  max-width: 600px;
+  animation: crawl 60s linear infinite;
+}
+
+@keyframes crawl {
+  0% {
+    transform: rotateX(25deg) translateZ(0) translateY(100vh);
+  }
+  100% {
+    transform: rotateX(25deg) translateZ(0) translateY(-300vh);
+  }
+}
+
+.enter-button {
+  z-index: 5;
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 16px 28px;
+  font-size: 1.2rem;
+  background: #222;
+  color: #ffe81f;
+  border: 2px solid #ffe81f;
+  border-radius: 8px;
+  box-shadow: 0 0 12px #ffe81f80;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.enter-button:hover {
+  background: #ffe81f;
+  color: #000;
+  box-shadow: 0 0 20px #ffe81f;
+  transform: translateX(-50%) scale(1.05);
+}
+
+.star-wars-intro .intro-text {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #00bfff;
+  opacity: 0;
+  animation: introFadeInOut 4.5s ease-in-out forwards;
+  margin-top: 3rem;
+  z-index: 2;
+  position: relative;
+}
+
+@keyframes introFadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+
+.star-wars-intro .crawl {
+  font-size: 200%;
+  color: yellow;
+  transform: rotateX(25deg);
+  transform-origin: bottom center;
+  animation: crawl 60s linear forwards;
+  animation-delay: 3.5s;
+}
+
+.enter-button {
+  animation: pulse-glow 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 10px #ffe81f, 0 0 20px #ffe81f80;
+  }
+  50% {
+    box-shadow: 0 0 25px #ffe81f, 0 0 40px #ffe81f99;
+  }
+  100% {
+    box-shadow: 0 0 10px #ffe81f, 0 0 20px #ffe81f80;
+  }
+}
+
+.enter-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, #fff20040 0%, #ffe81f10 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.enter-button:hover::after {
+  opacity: 1;
+}
+
+.ripple-effect {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100vmax;
+  height: 100vmax;
+  background: radial-gradient(circle, #ffe81f55 0%, transparent 80%);
+  transform: translate(-50%, -50%) scale(0);
+  animation: rippleExpand 0.6s ease-out forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes rippleExpand {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
