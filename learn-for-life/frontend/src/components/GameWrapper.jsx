@@ -13,6 +13,10 @@ import { generateRandomEvent } from '../utils/eventGenerator';
 import { initCustomParticles } from '../utils/customParticles';
 import { startAutoEventTimeout, clearAutoEventTimeout } from '../utils/autoEventTimeout';
 import EpochTransition from './EpochTransition';
+import GameLayout from './gameUI/GameLayout';
+
+
+
 
 function GameWrapper() {
   const [showEpochTransition, setShowEpochTransition] = useState(false);
@@ -22,7 +26,7 @@ function GameWrapper() {
   const [showLog, setShowLog] = useState(false);
   const [reputation, setReputation] = useState(0);
   const [repChangeText, setRepChangeText] = useState(null);
-  const [knowledge, setKnowledge] = useState(0);
+  const [knowledge, setKnowledge] = useState(9999);
   const [xp, setXp] = useState(0);
   const [autoKnowledge, setAutoKnowledge] = useState(0);
   const [upgrades, setUpgrades] = useState(upgradesData);
@@ -179,34 +183,31 @@ function GameWrapper() {
         {floatingTexts.map(ft => <FloatingText key={ft.id} {...ft} />)}
       </div>
 
-      <h1>📚 Век живи — век учись</h1>
-      <p>Знания: <strong>{Math.floor(knowledge)}</strong></p>
-      <p>Опыт: <strong>{Math.floor(xp)}</strong></p>
-      <p>🔁 Престиж: <strong>{prestigeLevel}</strong> (x{prestigeMultiplier})</p>
-      <p>🏛️ Эпоха: <strong>{currentEra}</strong></p>
-      <p>🌟 Репутация: <strong style={{ position: 'relative' }}>
-        {reputation}
-        {repChangeText && (
-          <span className={repChangeText.className} style={{ position: 'absolute', left: '110%', top: '-4px' }}>
-            {repChangeText.text}
-          </span>
-        )}
-      </strong></p>
+ <GameLayout
+  knowledge={knowledge}
+  xp={xp}
+  prestigeLevel={prestigeLevel}
+  prestigeMultiplier={prestigeMultiplier}
+  currentEra={currentEra}
+  reputation={reputation}
+  repChangeText={repChangeText}
+  onClickLearn={handleClick}
+  onToggleAudio={handleToggleAudio}
+  isMuted={isMuted}
+  onOpenLog={() => setShowLog(true)}
+  upgrades={upgrades}
+  onBuyUpgrade={handleBuyUpgrade}
+/>
 
-      <button className="click-button" onClick={handleClick}>Учиться 🧠</button>
-      <MusicToggleButton isMuted={isMuted} onToggle={handleToggleAudio} />
-      <button onClick={() => setShowLog(true)}>📜 История событий</button>
+
+
 
       {knowledge >= 10000 && (
         <PrestigeButton onPrestige={handlePrestige} multiplier={prestigeMultiplier + 0.1} />
       )}
 
-      <h2>Улучшения:</h2>
-      <div className="upgrades">
-        {upgrades.map(upg => (
-          <UpgradeItem key={upg.id} upgrade={upg} onBuy={handleBuyUpgrade} disabled={xp < upg.cost} />
-        ))}
-      </div>
+
+
 
       <audio ref={audioRef} loop>
         <source src="/lofi.mp3" type="audio/mpeg" />

@@ -1,5 +1,5 @@
 import React from 'react';
-import './EventLogModal.css';
+
 
 function EventLogModal({ onClose, eventLog = [] }) {
   return (

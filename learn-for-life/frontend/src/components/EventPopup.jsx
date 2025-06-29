@@ -1,5 +1,5 @@
 import React from 'react';
-import './EventPopup.css';
+
 
 function EventPopup({ event, onAccept, onDecline, onOk, countdown, aiComment, storyInfo }) {
   if (!event) return null;

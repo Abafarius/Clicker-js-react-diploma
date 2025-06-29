@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './EpochTransition.css';
+
 
 function EpochTransition({ currentEpoch, visible, onComplete }) {
   const [show, setShow] = useState(false);

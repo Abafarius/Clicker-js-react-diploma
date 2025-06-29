@@ -1,9 +1,17 @@
+// components/UpgradeItem.jsx
 function UpgradeItem({ upgrade, onBuy, disabled }) {
   return (
-    <div className="upgrade-item">
-      <span>{upgrade.name}</span>
-      <button onClick={() => onBuy(upgrade)} disabled={disabled}>
-        Купить за {upgrade.cost} XP
+    <div className="upgrade-card">
+      <div className="upgrade-info">
+        <div className="upgrade-title">{upgrade.name}</div>
+        <div className="upgrade-cost">Купить за {upgrade.cost} XP</div>
+      </div>
+      <button
+        className="upgrade-button"
+        onClick={() => onBuy(upgrade)}
+        disabled={disabled}
+      >
+        Купить
       </button>
     </div>
   );
