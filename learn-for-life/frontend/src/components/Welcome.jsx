@@ -1,26 +1,20 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../index.css';
+import { useWipe } from './WipeContext';
 
 function Welcome() {
-  const navigate = useNavigate();
+  const { wipeNavigate } = useWipe();
 
   const handleEnterClick = () => {
-    // Проигрываем голос
     const audio = new Audio('/the-force.mp3');
     audio.volume = 1.0;
     audio.play();
 
-    // Ripple эффект
     const ripple = document.createElement('span');
     ripple.className = 'ripple-effect';
     document.body.appendChild(ripple);
     setTimeout(() => ripple.remove(), 600);
 
-    // Переход на /login после задержки
-    setTimeout(() => {
-      navigate('/login');
-    }, 1800);
+    wipeNavigate('/login');
   };
 
   return (
@@ -40,7 +34,7 @@ function Welcome() {
             <br /><br />
             Только преодолев все эпохи, он сможет достичь титула Великого Учёного, способного пробудить знания в других.
             <br /><br />
-            Республика науки ждёт нового героя. Его зовут... 
+            Республика науки ждёт нового героя. Его зовут...
           </p>
         </div>
       </div>
@@ -60,3 +54,6 @@ function Welcome() {
 }
 
 export default Welcome;
+
+
+
