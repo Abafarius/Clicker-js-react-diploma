@@ -1,15 +1,31 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Keep this for direct navigation if needed elsewhere
-import { useWipe } from "../WipeContext"; // Import useWipe
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useWipe } from "../WipeContext";
 import "./Login.css";
-
-
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // Still useful for general navigation
-  const { wipeNavigate } = useWipe(); // Get wipeNavigate from context
+  const [stars, setStars] = useState([]);
+  const navigate = useNavigate();
+  const { wipeNavigate } = useWipe();
+
+  useEffect(() => {
+    // Генерация множества звёзд
+    const starElements = [];
+    for (let i = 0; i < 150; i++) {
+      const size = Math.random() * 2 + 1;
+      const style = {
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        width: `${size}px`,
+        height: `${size}px`,
+        animationDelay: `${Math.random() * 2}s`,
+      };
+      starElements.push(<div className="star" style={style} key={i} />);
+    }
+    setStars(starElements);
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,7 +42,7 @@ function Login() {
       if (response.ok) {
         localStorage.setItem("access_token", data.access);
         localStorage.setItem("refresh_token", data.refresh);
-        wipeNavigate("/game"); // Use wipeNavigate here
+        wipeNavigate("/game");
       } else {
         alert("Ошибка входа: " + data.detail || "Неверные данные");
       }
@@ -37,30 +53,31 @@ function Login() {
   };
 
   return (
-    <div className="login-container">
-      <h2>Вход</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Имя пользователя"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Войти</button>
-        <p>
-          Нет аккаунта? <a href="/register">Зарегистрироваться</a>
-        </p>
-        {/* If you want to navigate back to welcome with wipe, add a button/link here */}
-        {/* <button onClick={() => wipeNavigate('/')}>Back to Welcome</button> */}
-      </form>
+    <div className="login-page">
+      <div className="starfield">{stars}</div>
+      <div className="login-container">
+        <h2>Вход</h2>
+        <form onSubmit={handleLogin}>
+          <input
+            type="text"
+            placeholder="Имя пользователя"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">Войти</button>
+          <p>
+            Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
