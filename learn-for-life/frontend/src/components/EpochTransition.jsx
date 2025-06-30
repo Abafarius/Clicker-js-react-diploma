@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 function EpochTransition({ currentEpoch, visible, onComplete }) {
   const [show, setShow] = useState(false);
-  const totalDelay = `Новая эпоха: ${currentEpoch}`.length * 150 + 1500;
+  const totalDelay = `Новая эпоха: ${currentEpoch}`.length * 100 + 50;
   useEffect(() => {
     if (visible) {
       setShow(true);
