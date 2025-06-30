@@ -23,7 +23,7 @@
   --color-text-light: #f0f0f0;
   --color-text-dark: #111;
   --color-text-muted: #bbbbbb;
-  --color-accent-cyan: #3c00ff;
+  --color-accent-cyan: #00fffb;
   --color-accent-blue: #5f7eff;
   --color-accent-purple: #a855f7;
   --color-accent-orange: #ffa600;
@@ -55,6 +55,7 @@ body {
   font-size: 16px;
   line-height: 1.6;
   overflow-x: hidden;
+  
 }
 
 * {
