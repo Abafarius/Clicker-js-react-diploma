@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Keep this for direct navigation if needed elsewhere
+import { useWipe } from "../WipeContext"; // Import useWipe
 import "./Login.css";
+
+
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Still useful for general navigation
+  const { wipeNavigate } = useWipe(); // Get wipeNavigate from context
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,7 +26,7 @@ function Login() {
       if (response.ok) {
         localStorage.setItem("access_token", data.access);
         localStorage.setItem("refresh_token", data.refresh);
-        navigate("/game"); // перейти к игре
+        wipeNavigate("/game"); // Use wipeNavigate here
       } else {
         alert("Ошибка входа: " + data.detail || "Неверные данные");
       }
@@ -54,6 +58,8 @@ function Login() {
         <p>
           Нет аккаунта? <a href="/register">Зарегистрироваться</a>
         </p>
+        {/* If you want to navigate back to welcome with wipe, add a button/link here */}
+        {/* <button onClick={() => wipeNavigate('/')}>Back to Welcome</button> */}
       </form>
     </div>
   );
