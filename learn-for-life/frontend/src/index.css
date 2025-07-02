@@ -1318,3 +1318,35 @@ body {
   transform: scaleX(1);
 }
 
+.logout-btn {
+  background: #ff4444;
+  border: none;
+  padding: 8px 14px;
+  font-weight: bold;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #ff4444aa;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #cc0000;
+}
+
+.welcome-message {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  color: #00ffff;
+  font-size: 18px;
+  font-family: 'Comfortaa', sans-serif;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  z-index: 10;
+}
+
+
+
+
+
+

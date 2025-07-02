@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
@@ -14,23 +10,21 @@ import { WipeProvider } from './components/WipeContext';
 
 function App() {
   return (
-    <Router>
-      <WipeProvider>
-        <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/game"
-            element={
-              <PrivateRoute>
-                <GameWrapper />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </WipeProvider>
-    </Router>
+    <WipeProvider>
+      <Routes>
+        <Route path="/" element={<Welcome />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/game"
+          element={
+            <PrivateRoute>
+              <GameWrapper />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </WipeProvider>
   );
 }
 

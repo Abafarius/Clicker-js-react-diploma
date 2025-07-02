@@ -1,4 +1,3 @@
-// GameWrapper.jsx
 import { useState, useRef, useEffect } from 'react';
 import upgradesData from '../data/upgrades';
 import eras from '../data/eras';
@@ -12,7 +11,7 @@ import { initCustomParticles } from '../utils/customParticles';
 import { startAutoEventTimeout, clearAutoEventTimeout } from '../utils/autoEventTimeout';
 import EpochTransition from './EpochTransition';
 import GameLayout from './gameUI/GameLayout';
-
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -24,7 +23,7 @@ function GameWrapper() {
   const [showLog, setShowLog] = useState(false);
   const [reputation, setReputation] = useState(0);
   const [repChangeText, setRepChangeText] = useState(null);
-  const [knowledge, setKnowledge] = useState(9999);
+  const [knowledge, setKnowledge] = useState(0);
   const [xp, setXp] = useState(0);
   const [autoKnowledge, setAutoKnowledge] = useState(0);
   const [upgrades, setUpgrades] = useState(upgradesData);
@@ -38,7 +37,23 @@ function GameWrapper() {
   const [currentStory, setCurrentStory] = useState(null);
   const [storyStep, setStoryStep] = useState(0);
 
+  
+  const navigate = useNavigate();
   const currentEra = eras[prestigeLevel] || '∞ Вечный Ученик';
+
+
+let username = 'Ученый';
+const token = localStorage.getItem('token');
+
+if (token) {
+  try {
+    const decoded = jwtDecode(token);
+    username = decoded.username || decoded.name || decoded.email || 'Ученый';
+  } catch (error) {
+    console.error('Ошибка декодирования JWT:', error);
+  }
+}
+
 
   const triggerRepChange = (amount) => {
     setRepChangeText({
@@ -118,8 +133,13 @@ function GameWrapper() {
     }
   };
 
-  useEffect(() => initCustomParticles(), []);
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    navigate('/login');
+  };
 
+  useEffect(() => initCustomParticles(), []);
   useEffect(() => {
     const timer = setInterval(() => {
       if (currentStory) {
@@ -151,7 +171,6 @@ function GameWrapper() {
     if (currentEvent) {
       setAiComment('');
       setAutoCountdown(15);
-
       startAutoEventTimeout(() => {
         setAiComment('🤖 Ты задумался слишком долго, решение принято за тебя...');
         if (currentEvent.type === 'Choices') {
@@ -171,6 +190,10 @@ function GameWrapper() {
 
   return (
     <div className="app">
+      <div style={{ position: 'absolute', top: 10, right: 20, zIndex: 10 }}>
+        <button onClick={handleLogout} className="logout-btn">Выйти</button>
+      </div>
+
       <EpochTransition
         currentEpoch={currentEra}
         visible={showEpochTransition}
@@ -181,31 +204,25 @@ function GameWrapper() {
         {floatingTexts.map(ft => <FloatingText key={ft.id} {...ft} />)}
       </div>
 
- <GameLayout
-  knowledge={knowledge}
-  xp={xp}
-  prestigeLevel={prestigeLevel}
-  prestigeMultiplier={prestigeMultiplier}
-  currentEra={currentEra}
-  reputation={reputation}
-  repChangeText={repChangeText}
-  onClickLearn={handleClick}
-  onToggleAudio={handleToggleAudio}
-  isMuted={isMuted}
-  onOpenLog={() => setShowLog(true)}
-  upgrades={upgrades}
-  onBuyUpgrade={handleBuyUpgrade}
-/>
-
-
-
+      <GameLayout
+        knowledge={knowledge}
+        xp={xp}
+        prestigeLevel={prestigeLevel}
+        prestigeMultiplier={prestigeMultiplier}
+        currentEra={currentEra}
+        reputation={reputation}
+        repChangeText={repChangeText}
+        onClickLearn={handleClick}
+        onToggleAudio={handleToggleAudio}
+        isMuted={isMuted}
+        onOpenLog={() => setShowLog(true)}
+        upgrades={upgrades}
+        onBuyUpgrade={handleBuyUpgrade}
+      />
 
       {knowledge >= 10000 && (
         <PrestigeButton onPrestige={handlePrestige} multiplier={prestigeMultiplier + 0.1} />
       )}
-
-
-
 
       <audio ref={audioRef} loop>
         <source src="/lofi.mp3" type="audio/mpeg" />
