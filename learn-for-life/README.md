@@ -1,12 +1,43 @@
-# React + Vite
+# 🎮 Век живи — век учись
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Браузерная кликер-игра с полной системой регистрации и авторизации.  
+Проект выполнен в рамках дипломной работы в Академии "ШАГ".
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Стек технологий
 
-## Expanding the ESLint configuration
+### 🖥️ Фронтенд:
+- React (на JavaScript)
+- Vite
+- Axios
+- React Router
+- Анимации (CSS, Framer Motion)
+- Авторизация через JWT
+- Адаптивный UI
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 🛠️ Бэкенд:
+- Django 4.x
+- Django REST Framework
+- djangorestframework-simplejwt
+- SQLite (по умолчанию)
+
+---
+
+## 📦 Установка
+
+### ⚙️ Клонировать проект:
+```bash
+git clone https://github.com/Abafarius/Clicker-js-react-diploma.git
+cd learn-for-life
+
+
+python -m venv venv
+venv\Scripts\activate   # или source venv/bin/activate на Mac/Linux
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+
+cd frontend
+npm install
+npm run dev
